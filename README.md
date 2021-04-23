@@ -1,2 +1,2 @@
-# recsys-devops
-devops for recommendation system
+# dolphin-recsys-devops
+devops for dolphin recommendation system
