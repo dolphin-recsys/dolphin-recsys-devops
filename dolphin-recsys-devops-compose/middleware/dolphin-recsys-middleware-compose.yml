@@ -1,0 +1,86 @@
+# author: wxt
+# description: middleware containers for dolphin-recsys
+# time: 2021/05/09
+# version: 1.0
+version: "3"
+services:
+  # mysql
+  mysql:
+    image: mysql:${MYSQL_TAG}
+    container_name: mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - "MYSQL_ROOT_PASSWORD=Passw0rd1!"
+    volumes:
+      - "${MYSQL_DATA_FOLDER}:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+
+  # redis
+  redis:
+    image: redis:${REDIS_TAG}
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis.conf
+    volumes:
+      - "${REDIS_DATA_FOLDER}:/data"
+      - "${REDIS_CONFIG_PATH}:/usr/local/etc/redis.conf"
+  
+  # elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_TAG}
+    container_name: elasticsearch
+    environment:
+      - cluster.name=esstack
+      - node.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=elasticsearch
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - "${ELASTICSEARCH_DATA_FOLDER}:/usr/share/elasticsearch/data"
+    ports:
+      - "9200:9200"
+  
+  # kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${KIBANA_TAG}
+    container_name: kibana
+    environment:
+      - I18N_LOCALE=zh-CN
+      - XPACK_GRAPH_ENABLED=true
+      - TIMELION_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+
+  # mongo
+  mongo:
+    image: mongo:${MONGO_TAG}
+    container_name: mongo
+    restart: always
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME=root"
+      - "MONGO_INITDB_ROOT_PASSWORD=Passw0rd1!"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "${MONGO_DATA_FOLDER}:/data/db"
+
+# define networks
+networks:
+  default:
+    name: dolphin-recsys-middleware-net
+    driver: bridge
+  

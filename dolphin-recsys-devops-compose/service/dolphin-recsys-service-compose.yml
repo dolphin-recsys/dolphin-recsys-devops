@@ -1,0 +1,17 @@
+# author: wxt
+# time: 2021/05/09
+# version: 1.0
+# description: service containers for dolphin-recsys
+version: "3"
+services:
+  dolphin-recsys-web-service:
+    image: nginx:latest
+
+# define networks
+networks:
+  service-net:
+    name: dolphin-recsys-service-net
+    driver: bridge
+  middleware-net:
+    external:
+      name: dolphin-recsys-middleware-net
