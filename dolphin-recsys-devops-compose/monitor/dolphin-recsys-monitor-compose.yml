@@ -1,0 +1,22 @@
+# author: wxt
+# time: 2021/05/09
+# version: 1.0
+# description: monitor containers for dolphin-recsys
+version: "3"
+services:
+  portainer-ce:
+    image: portainer/portainer:${PORTAINER_TAG}
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"
+      - "8000:8000"
+    # docker.sock used to communicate with docker engine daemon
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${PORTAINER_DATA_FOLDER}:/data"
+
+networks:
+  default:
+    name: dolphin-recsys-monitor-net
+    driver: bridge
